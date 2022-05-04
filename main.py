@@ -71,7 +71,16 @@ def get_all_items():
         }
         joblist.append(data_dict)
 
-    print(joblist)
+    try:
+        os.mkdir('json_result')
+    except FileExistsError:
+        pass
+
+    with open('json_result/indeed_joblisy.json', 'w+') as json_data:
+        json.dump(joblist, json_data)
+    print('json created')
+
+
 
 
 if __name__ == '__main__':
