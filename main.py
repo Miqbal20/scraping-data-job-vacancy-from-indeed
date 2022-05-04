@@ -50,10 +50,6 @@ def get_all_items():
     }
     res = requests.get(url, params=params, headers=headers)
 
-    with open('temp/res.html', 'w+') as outfile:
-        outfile.write(res.text)
-        outfile.close()
-
     # Proses Scrapping
     soup = BeautifulSoup(res.text, 'html.parser')
     contents = soup.find_all('table', 'jobCard_mainContent big6_visualChanges')
@@ -80,15 +76,16 @@ def get_all_items():
     except FileExistsError:
         pass
 
-    with open('json_result/indeed_joblisy.json', 'w+') as json_data:
+    with open('json_result/indeed_joblist.json', 'w+') as json_data:
         json.dump(joblist, json_data)
     print('json created')
 
     # create csv and excel
     df = pd.DataFrame(joblist)
     df.to_csv('indeed_joblist.csv', index=False)
+    print('data csv created')
     df.to_excel('indeed_joblist.xlsx', index=False)
-    print('data csv and excel created')
+    print('data excel created')
 
 
 if __name__ == '__main__':
