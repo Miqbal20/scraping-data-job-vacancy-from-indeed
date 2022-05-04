@@ -2,6 +2,9 @@ import os
 import json
 import requests
 from bs4 import BeautifulSoup
+import pandas as pd
+import openpyxl
+
 
 # Definisi Parameter
 url = "https://id.indeed.com/jobs?q="
@@ -71,6 +74,7 @@ def get_all_items():
         }
         joblist.append(data_dict)
 
+    # create json
     try:
         os.mkdir('json_result')
     except FileExistsError:
@@ -80,7 +84,11 @@ def get_all_items():
         json.dump(joblist, json_data)
     print('json created')
 
-
+    # create csv and excel
+    df = pd.DataFrame(joblist)
+    df.to_csv('indeed_joblist.csv', index=False)
+    df.to_excel('indeed_joblist.xlsx', index=False)
+    print('data csv and excel created')
 
 
 if __name__ == '__main__':
