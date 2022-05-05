@@ -12,10 +12,11 @@ headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/
                          'Chrome/100.0.4896.127 Safari/537.36'}
 
 
-def get_total_pages():
+def get_total_pages(query, location, start):
     params = {
-        'q': 'Laravel Developer',
-        'l': 'Indonesia',
+        'q': query,
+        'l': location,
+        'start': start,
         'vjk': '177b29f46a3befe1',
     }
     res = requests.get(url, params=params, headers=headers)
@@ -41,11 +42,12 @@ def get_total_pages():
     return total
 
 
-def get_all_items():
+def get_all_items(query, location, start, page):
     company_url = 'https://id.indeed.com'
     params = {
-        'q': 'Laravel Developer',
-        'l': 'Indonesia',
+        'q': query,
+        'l': location,
+        'start': start,
         'vjk': '177b29f46a3befe1',
     }
     res = requests.get(url, params=params, headers=headers)
@@ -76,17 +78,51 @@ def get_all_items():
     except FileExistsError:
         pass
 
-    with open('json_result/indeed_joblist.json', 'w+') as json_data:
+    # export ke json
+    with open(f'json_result/{query}_in_{location}_page_{page}.json', 'w+') as json_data:
         json.dump(joblist, json_data)
-    print('json created')
+    print(f'json page {page} berhasil dibuat')
+    return joblist
 
-    # create csv and excel
-    df = pd.DataFrame(joblist)
-    df.to_csv('indeed_joblist.csv', index=False)
-    print('data csv created')
-    df.to_excel('indeed_joblist.xlsx', index=False)
-    print('data excel created')
+
+def create_document(data_frame, file_name, page):
+    try:
+        os.mkdir('data_result')
+    except FileExistsError:
+        pass
+
+    # export ke csv dan excel
+    df = pd.DataFrame(data_frame)
+    df.to_csv(f'data_result/{file_name}.csv', index=False)
+    print(f'Data {file_name} di page {page} berhasil di Export ke Csv')
+    df.to_excel(f'data_result/{file_name}.xlsx', index=False)
+    print(f'Data {file_name} di page {page} berhasil di Export ke Excel')
+
+
+def run():
+    query = input('Masukan kata kunci: ')
+    location = input('Masukan lokasi: ')
+
+    counter = 0
+    total = get_total_pages(query, location, counter)
+    final_result = []
+    for page in range(total):
+        page += 1
+        counter += 10
+        final_result += get_all_items(query, location, counter, page)
+
+        # formating data
+        try:
+            os.mkdir('reports')
+        except FileExistsError:
+            pass
+
+        with open('reports/{}.json'.format(query), 'w+') as final_data:
+            json.dump(final_result, final_data)
+
+        print('Report Json berhasil dibuat\n')
+        create_document(final_result, query, page)
 
 
 if __name__ == '__main__':
-    get_all_items()
+    run()
