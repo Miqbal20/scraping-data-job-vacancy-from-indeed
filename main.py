@@ -4,6 +4,7 @@ import requests
 from bs4 import BeautifulSoup
 import pandas as pd
 import openpyxl
+import turtle as tur
 
 
 # Definisi Parameter
@@ -58,6 +59,9 @@ def get_all_items(query, location, start, page):
     joblist = []
     for item in contents:
         title = item.find('h2', 'jobTitle').text
+        tur.onclick(title)
+        print(title)
+
         company = item.find('span', 'companyName')
         company_name = company.text
         try:
