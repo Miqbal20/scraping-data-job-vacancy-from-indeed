@@ -65,10 +65,21 @@ def get_all_items(query, location, start, page):
         except:
             link = 'Link is not available'
 
+        company_get_location = item.find('div', 'companyLocation')
+        company_location = company_get_location.text
+
+        try:
+            company_get_salary = item.find('div', 'metadata salary-snippet-container')
+            company_salary = company_get_salary.text
+        except:
+            company_salary = 'Gaji tidak disebutkan'
+
         data_dict = {
             'title': title,
             'company name': company_name,
             'company link': link,
+            'company location': company_location,
+            'salary': company_salary,
         }
         joblist.append(data_dict)
 
