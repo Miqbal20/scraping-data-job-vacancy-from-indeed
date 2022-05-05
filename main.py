@@ -1,11 +1,17 @@
+# Untuk membuat folder
 import os
-import json
-import requests
-from bs4 import BeautifulSoup
-import pandas as pd
-import openpyxl
-import turtle as tur
 
+# megolah json
+import json
+
+# mengolah http / https
+import requests
+
+# scraping data
+from bs4 import BeautifulSoup
+
+# convert data ke excel  csv
+import pandas as pd
 
 # Definisi Parameter
 url = "https://id.indeed.com/jobs?q="
@@ -21,15 +27,12 @@ def get_total_pages(query, location, start):
         'vjk': '177b29f46a3befe1',
     }
     res = requests.get(url, params=params, headers=headers)
+
     # Pembuatan Temporary Folder untuk menampung hasil Scrapping
     try:
         os.mkdir('temp')
     except FileExistsError:
         pass
-
-    with open('temp/res.html', 'w+') as outfile:
-        outfile.write(res.text)
-        outfile.close()
 
     # Proses Scrapping
     soup = BeautifulSoup(res.text, 'html.parser')
@@ -59,15 +62,13 @@ def get_all_items(query, location, start, page):
     joblist = []
     for item in contents:
         title = item.find('h2', 'jobTitle').text
-        tur.onclick(title)
-        print(title)
-
         company = item.find('span', 'companyName')
         company_name = company.text
         try:
             link = company_url + company.find('a')['href']
-        except:
-            link = 'Link is not available'
+
+        except Exception:
+            link = 'Link tidak tersedia'
 
         company_get_location = item.find('div', 'companyLocation')
         company_location = company_get_location.text
@@ -75,15 +76,15 @@ def get_all_items(query, location, start, page):
         try:
             company_get_salary = item.find('div', 'metadata salary-snippet-container')
             company_salary = company_get_salary.text
-        except:
+        except Exception:
             company_salary = 'Gaji tidak disebutkan'
 
         data_dict = {
-            'title': title,
-            'company name': company_name,
-            'company link': link,
-            'company location': company_location,
-            'salary': company_salary,
+            'Judul': title,
+            'Nama Perusahaan': company_name,
+            'Link Perusahaan': link,
+            'Lokasi': company_location,
+            'Gaji': company_salary,
         }
         joblist.append(data_dict)
 
